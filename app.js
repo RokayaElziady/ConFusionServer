@@ -20,7 +20,8 @@ const Dishes = require('./models/dishes');
 const Leaders = require('./models/leaders');
 const Promotions= require('./models/promotions');
 
-const url = 'mongodb://localhost:27017/confusion';
+var config = require('./config');
+const url = config.mongoUrl;
 const connect = mongoose.connect(url);
 
 connect.then((db) => {
@@ -39,42 +40,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser('12345-67890-09876-54321'));
 
-app.use(session({
-  name: 'session-id',
-  secret: '12345-67890-09876-54321',
-  saveUninitialized: false,
-  resave: false,
-  store: new FileStore()
-}));
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 
-function auth (req, res, next) {
-  console.log(req.user);
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
 
-  if (!req.user) {
-    var err = new Error('You are not authenticated!');
-    err.status = 403;
-    next(err);
-  }
-  else {
-        next();
-  }
-}
 
-app.use(auth);
+
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/dishes',dishRouter);
-app.use('/promotions',promoRouter);
-app.use('/leaders',leaderRouter);
+//app.use('/promotions',promoRouter);
+//app.use('/leaders',leaderRouter);
 
 
 // catch 404 and forward to error handler
@@ -87,7 +70,7 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
+    console.log("erooor")
   // render the error page
   res.status(err.status || 500);
   res.render('error');
